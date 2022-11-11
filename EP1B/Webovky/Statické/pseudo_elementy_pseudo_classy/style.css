@@ -1,0 +1,62 @@
+h1{
+    text-align: center;
+    color: green;
+}
+
+h1::first-letter{
+    color: red;
+}
+
+p{
+    color: blue;
+}
+
+.paragraf::first-line{
+    color: red;
+}
+
+.b::before {
+    content: url(https://th.bing.com/th/id/OIP.7peCUIfk6L_nS9ihRu1UuwHaHZ?pid=ImgDet&rs=1);
+}
+
+.b::after {
+    content: url(https://th.bing.com/th/id/OIP.7peCUIfk6L_nS9ihRu1UuwHaHZ?pid=ImgDet&rs=1);
+}
+
+::marker{
+    color: goldenrod;
+}
+
+::selection{
+    background-color: black;
+    color: white;
+}
+
+h1::selection{
+    background-color: darkmagenta;
+    color: aqua;
+}
+
+li{
+    width: fit-content;
+}
+
+li:hover{
+    background-color: aqua;
+}
+
+p {
+    font-weight: bold;
+}
+
+li:first-child {
+    border: 2px solid orange;
+}
+
+a:link{
+    color: red;
+}
+
+a:visited{
+    color: green;
+}
