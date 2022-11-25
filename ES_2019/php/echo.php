@@ -9,6 +9,13 @@
 </head>
 <body>
     <?php 
+        // komentář
+        /* 
+            komentář
+            na
+            více
+            řádků
+        */
         echo "<h1>Nadpis</h1>";
         echo "<a href='https://www.google.com'>Odkaz</a>";
     ?>
