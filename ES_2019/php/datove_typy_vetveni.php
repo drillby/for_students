@@ -9,10 +9,10 @@
 <body>
     <?php
     // základní datové typy
-    $promenna = 40;
-    $promenna_2 = "Text";
-    $promenna_3 = true;
-    $promenna_4 = 26.12;
+    $promenna = 40; // int
+    $promenna_2 = "Text"; // string
+    $promenna_3 = true; // boolean
+    $promenna_4 = 26.12; // float
 
     // přetypování
     $int_to_str = strval($promenna_4);
