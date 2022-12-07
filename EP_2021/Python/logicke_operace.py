@@ -1,7 +1,7 @@
 a = 25 # 'a' má hodnotu 25
 a == 25 # zkoumámí hodnoty
 
-if a >= 25:
+if a >= 25: # a >= 25 == True
     print(True)
 else:
     print(False)
