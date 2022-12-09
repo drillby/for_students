@@ -1,0 +1,12 @@
+/* odkázání se na atribut, který chci měnit */
+p {
+	/* pravidlo: hodnota */
+	color: blue;
+}
+
+h1 {
+	/* aplikace více pravidel zároveň */
+	background-color: blue;
+	color: yellow;
+	text-align: center;
+}
