@@ -44,6 +44,7 @@ while running:
 
     # Aktualizuj okno
     pygame.display.flip()
+    okno.fill((0, 0, 0))
 
 # Ukonči PyGame
 pygame.quit()
