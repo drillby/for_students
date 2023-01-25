@@ -31,5 +31,7 @@ promena_5 = str(promena_5)
 promena_4 = str(promena_4)
 promena_4 = float(promena_4)
 
+print(3*"ahoj")
+
 user_input = input("Něco napiš... ")
 print(user_input, type(user_input))
