@@ -47,3 +47,5 @@ if inp == "1":
 
     for prvocislo in erathosenovo_sito(int(cislo)):
         print(prvocislo, end=", ")
+
+# TODO: Zapisování do souboru, načítání ze souboru, rozodování pro zápis do souboru, nebo výpis do terminálu
