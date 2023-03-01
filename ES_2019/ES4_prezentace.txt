@@ -1,0 +1,15 @@
+Daniš - 17 -> 1
+Zámiš - 11 -> 2
+Hartman - 12 -> 3
+Kubeš - 16 -> 4
+Baroch - 1 -> 5
+Veselý - 7 -> 6
+Podubecký - 8 -> 7
+Šístek - 14 -> 8
+Zdeněk - 13 -> 9
+Podrazil - 15 -> 10
+Fiřt - 18 -> 11
+Zacpal - 19 -> 12
+Slepička - 10 -> 13
+Sekera - 9 -> 14
+
