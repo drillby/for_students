@@ -1,6 +1,6 @@
-Dundr - 15 -> 1
-Fousek - 12 -> 2
-Dvořák - 8 -> 3
+Dundr - 15 -> 1 h
+Fousek - 12 -> 2 h
+Dvořák - 8 -> 3 h
 Beran - 13 -> 4
 Bureš - 14 -> 5
 Hanzl - 6 -> 6
