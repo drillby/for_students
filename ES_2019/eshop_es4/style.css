@@ -1,0 +1,27 @@
+.dlazdice {
+    background-color: grey;
+    width: 15vw;
+    height: 50vh;
+}
+
+.dlazdice-img {
+    width: 100px;
+    height: 100px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dlazdice-nazev {
+    text-align: center;
+    font-size: smaller;
+}
+
+.dlazdice-cena{
+    position: relative;
+    text-align: center;
+}
+
+.nazev-cena-wrapper {
+    height: 19vh;
+}
