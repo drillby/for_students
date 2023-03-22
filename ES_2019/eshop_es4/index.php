@@ -12,18 +12,33 @@
     require "./conifg.php";
     require "./dlazdice.php";
 
-    $conn = mysqli_connect($servername, $username, $password, $dbname);
-
-    if (!$conn)
-        die("Nepodařilo se navázat spojení se serverem. Zkuste to později.");
-
     $sql = "SELECT * FROM Produkt";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) > 0) {
+        $pocet_produktu = 0;
+        ?>
+        <table>
+            <tr>
+        <?php
         while ($row = mysqli_fetch_assoc($result)) {
-            zobrazDlazdici($row["nazev"], $row["cena"], $row["obrazek"], $row["mnozstvi"]);
+            $pocet_produktu = $pocet_produktu + 1;
+            if ($pocet_produktu % 4 == 0){
+                ?>
+                </tr>
+                <tr>
+                <?php
+            }
+            ?>
+            <td>
+                <?php zobrazDlazdici($row["nazev"], $row["cena"], $row["obrazek"], $row["mnozstvi"]); ?>
+            </td>
+            <?php
         }
+        ?>
+            </tr>
+        </table>
+        <?php
     }
     // příště zobrazit v tabukce/gridu
     ?>
