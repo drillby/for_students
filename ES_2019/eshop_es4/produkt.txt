@@ -1,5 +1,0 @@
-cena
-množství
-popis
-název
-obrázek
