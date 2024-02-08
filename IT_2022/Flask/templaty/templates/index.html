@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <ul>
+        {% for jidlo in promenna %}
+        <li>{{ jidlo }}</li>
+        {% endfor %}
+    </ul>
+    {{ promenna.1 }}
+        {% for klic in slovnik.keys() %}
+        <li>klíč {{ klic }} má hodnotu {{ slovnik[klic] }}</li>
+        {% endfor %}
+
+    {% if cislo == cislo_2 %}
+    <h1>Číslo má hodnotu 5 !</h1>
+    {% endif %}
+
+    {% if cislo > cislo_2 %}
+        <h1>Číslo je větší než {{ cislo_2 }}</h1>
+    {% else %}
+        <h1>Číslo je menší než {{ cislo_2 }}</h1>
+    {% endif %}
+
+    {% if cislo > cislo_2 %}
+        <h1>Číslo je větší než {{ cislo_2 }}</h1>
+    {% elif cislo < cislo_2 %}
+        <h1>Číslo je menší než {{ cislo_2 }}</h1>
+    {% else %}
+        <h1>Číslo má hodnotu {{ cislo_2 }}</h1>
+    {% endif %}
+</body>
+</html>
