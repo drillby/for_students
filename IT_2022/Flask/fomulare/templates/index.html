@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+			tempor incididunt ut labore et dolore magna aliqua. Pharetra pharetra
+			massa massa ultricies mi quis. Bibendum enim facilisis gravida neque
+			convallis a cras. Eu turpis egestas pretium aenean pharetra magna ac
+			placerat. Parturient montes nascetur ridiculus mus mauris. Sed odio morbi
+			quis commodo odio. Euismod elementum nisi quis eleifend quam adipiscing
+			vitae proin. Sit amet mauris commodo quis imperdiet. Auctor neque vitae
+			tempus quam pellentesque nec. Id faucibus nisl tincidunt eget nullam non
+			nisi est sit. Tellus mauris a diam maecenas sed enim ut sem. Eleifend mi
+			in nulla posuere sollicitudin. At erat pellentesque adipiscing commodo
+			elit at. Dignissim suspendisse in est ante in nibh mauris. Facilisis
+			mauris sit amet massa vitae tortor condimentum lacinia quis.
+		</p>
+		<p>
+			In pellentesque massa placerat duis ultricies lacus sed turpis. Tellus
+			rutrum tellus pellentesque eu tincidunt tortor aliquam nulla. Et tortor
+			consequat id porta nibh venenatis cras sed felis. At quis risus sed
+			vulputate odio. Sed risus pretium quam vulputate dignissim. Maecenas
+			ultricies mi eget mauris pharetra et ultrices. Consectetur libero id
+			faucibus nisl tincidunt. Erat imperdiet sed euismod nisi porta lorem
+			mollis. Vestibulum mattis ullamcorper velit sed. Dis parturient montes
+			nascetur ridiculus. Aenean sed adipiscing diam donec adipiscing tristique
+			risus. Facilisis gravida neque convallis a cras. Etiam non quam lacus
+			suspendisse. Enim blandit volutpat maecenas volutpat blandit. Interdum
+			velit euismod in pellentesque massa placerat duis. Vitae tortor
+			condimentum lacinia quis. Elementum eu facilisis sed odio.
+		</p>
+		<form action="{{ url_for('zpracuj_komenmtar') }}" method="POST">
+			<label for="jmeno">Jméno:</label>
+			<input type="text" name="jmeno" required /><br />
+			<label for="obsah">Obsah:</label>
+			<input type="textarea" name="obsah" required />
+			<input type="submit" value="Odeslat" />
+		</form>
+		<div>
+			{% for komentar in komentare %}
+			<ul>
+				<li>{{ komentar.jmeno | title}}</li>
+				<li>{{ komentar.obsah | title}}</li>
+			</ul>
+			{% endfor %}
+		</div>
+	</body>
+</html>
