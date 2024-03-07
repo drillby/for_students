@@ -1,4 +1,3 @@
-# https://m3m4ndtv-5000.euw.devtunnels.ms/
 from flask import Flask
 
 app = Flask(__name__)
