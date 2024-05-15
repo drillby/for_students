@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<form action="{{ url_for('zpracuj_formular') }}" method="post">
+			<label for="">Jméno: </label>
+			<input type="text" name="name" id="name" required /><br />
+			<label for="">Komentář: </label>
+			<textarea
+				name="comment"
+				id="comment"
+				cols="30"
+				rows="10"
+				required
+			></textarea
+			><br />
+			<input type="submit" value="Odeslat" />
+		</form>
+		{% for komentar in komentare %}
+		<a href="{{url_for('zobraz_komentar', index=loop.index0)}}"
+			>{{ komentar.name }}: {{ komentar.comment }}</a
+		><br />
+		{% endfor %}
+	</body>
+</html>

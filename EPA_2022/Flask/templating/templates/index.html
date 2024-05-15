@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<ol>
+			{% for prvek in pole %}
+			<li>{{prvek}}</li>
+			{% endfor %}
+		</ol>
+		{% for clovek in slovnik %}
+		<h1>{{clovek.jmeno}}</h1>
+		<p>{{clovek.vek}}</p>
+		<p>{{clovek.mesto}}</p>
+		{% endfor %} {{slovnik_2.items()}} {% if cislo == 5 %}
+		<h1>Číslo je 5</h1>
+		{% elif cislo < 5 %}
+		<h1>Číslo je menší než 5</h1>
+		{% else %}
+		<h1>Číslo je větší než 5</h1>
+		{% endif %} {% if "o" in "abc" %}
+		<h1>Obsahuje</h1>
+		{% endif %}
+	</body>
+</html>
