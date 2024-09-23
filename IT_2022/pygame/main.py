@@ -1,4 +1,3 @@
-# TODO: Mince se smaže a objeví se nová na jiném místě (ne jednom přemístění)
 # TODO: Přidat eventy pro změnu barvy mince, hráče, pozadí
 # TODO: Mince bude textura
 # TODO: Restart button
@@ -14,18 +13,28 @@ OKNO_VYSKA = 600
 
 CERNA = (0, 0, 0)
 BILA = (255, 255, 255)
+ZLUTA = (255, 255, 0)
+
+VELIKOST_MINCE = 10
+
+POCET_MINCI_START = 3
+MAX_POCET_MINCI = 10
 
 
 clock = pg.time.Clock()
 FPS = 60
 
-GAME_OVER_SEC = 10
+GAME_OVER_SEC = 20
 GAME_OVER_EVENT = pg.USEREVENT + 1
 pg.time.set_timer(GAME_OVER_EVENT, GAME_OVER_SEC * 1000)
 
-SPAWN_COIN_SEC = 3
+SPAWN_COIN_SEC = 1
 SPAWN_COIN_EVENT = pg.USEREVENT + 2
-pg.time.set_timer(GAME_OVER_EVENT, SPAWN_COIN_SEC * 1000)
+pg.time.set_timer(SPAWN_COIN_EVENT, SPAWN_COIN_SEC * 1000)
+
+# TODO: dodělat event na změnu barvy pozadí po sebrání mince
+CHANGE_BG_EVENT = pg.USEREVENT + 3
+change_bg_event = pg.event.Event(CHANGE_BG_EVENT)
 # create a font object.
 # 1st parameter is the font file
 # which is present in pygame.
@@ -37,14 +46,12 @@ font_game_over = pg.font.Font('freesansbold.ttf', 64)
 pocet_minci = 0
 
 
-class Hrac:
-    def __init__(self, souradnice, rozmer, barva, rychlost=5):
+class GameObject:
+    def __init__(self, souradnice, barva):
         self.__x = souradnice[0]
         self.__y = souradnice[1]
-        self.velikost_x = rozmer[0]
-        self.velikost_y = rozmer[1]
         self.barva = barva
-        self.rychlost = rychlost
+
 
     @property
     def x(self):
@@ -71,6 +78,14 @@ class Hrac:
             self.__y = OKNO_VYSKA - self.velikost_y
         else:
             self.__y = hodnota
+
+
+class Hrac(GameObject):
+    def __init__(self, souradnice, rozmer, barva, rychlost=5):
+        super().__init__(souradnice, barva)
+        self.velikost_x = rozmer[0]
+        self.velikost_y = rozmer[1]
+        self.rychlost = rychlost
 
     def pohyb(self, stisknute_klavesy):
         move_x = 0
@@ -99,12 +114,10 @@ class Hrac:
         )
 
 
-class Coin:
+class Coin(GameObject):
     def __init__(self, souradnice, velikost, barva):
-        self.x = souradnice[0]
-        self.y = souradnice[1]
+        super().__init__(souradnice, barva)
         self.velikost = velikost
-        self.barva = barva
 
     def vykresli(self, okno):
         pg.draw.circle(okno, self.barva, (self.x, self.y), self.velikost)
@@ -145,8 +158,14 @@ def vypis(napis, barva_textu, barva_pozadi, font, origin_point, pozice):
 
 
 H1 = Hrac((100, 100), (50, 50), BILA)
-C1 = Coin((200, 200), 10, (255, 255, 0))
-mince = [C1]
+mince = []
+
+for _ in range(POCET_MINCI_START):
+    x = random.randint(0, OKNO_SIRKA - (2 * VELIKOST_MINCE))
+    y = random.randint(0, OKNO_SIRKA - (2 * VELIKOST_MINCE))
+    mince.append(
+        Coin((x, y), VELIKOST_MINCE, ZLUTA)
+    )
 
 
 okno = pg.display.set_mode((OKNO_SIRKA, OKNO_VYSKA))
@@ -162,9 +181,12 @@ while running:
         if event.type == GAME_OVER_EVENT:
             muze_hybat = False
         if event.type == SPAWN_COIN_EVENT:
-            mince.push(
-                Coin((200, 200), 10, (255, 255, 0))
-            )
+            if len(mince) < MAX_POCET_MINCI:
+                x = random.randint(0, OKNO_SIRKA - (2 * VELIKOST_MINCE))
+                y = random.randint(0, OKNO_VYSKA - (2 * VELIKOST_MINCE))
+                mince.append(
+                    Coin((x, y), VELIKOST_MINCE, ZLUTA)
+                )
 
     stisknute_klavesy = pg.key.get_pressed()
 
@@ -173,19 +195,18 @@ while running:
         napis = 'Počet mincí: {pocet_minci}'.format(pocet_minci=pocet_minci)
         text, textRect = vypis(napis, BILA, CERNA, font, "topleft", (10, 10))
 
-    if kolize(H1, C1):
-        C1.x = random.randint(0, OKNO_SIRKA - C1.velikost)
-        C1.y = random.randint(0, OKNO_VYSKA - C1.velikost)
-        pocet_minci += 1
-        napis = 'Počet mincí: {pocet_minci}'.format(pocet_minci=pocet_minci)
-        text, textRect = vypis(napis, BILA, CERNA, font, "topleft", (10,10))
+    for idx, coin in enumerate(mince):
+        if kolize(H1, coin):
+            mince.pop(idx)
+            pocet_minci += 1
 
     okno.fill(CERNA)
 
 
     # vykresleni ctverce
     if muze_hybat:
-        C1.vykresli(okno)
+        for coin in mince:
+            coin.vykresli(okno)
         H1.vykresli(okno)
 
     if not muze_hybat:
