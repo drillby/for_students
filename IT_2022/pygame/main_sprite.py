@@ -15,10 +15,33 @@ pg.display.set_caption("Coin Picker")
 FPS = 60
 clock = pg.time.Clock()
 
-CERNA = (0, 0, 0)
 BILA = (255, 255, 255)
+CERNA = (0, 0, 0)
+
+skore_font = pg.font.Font('freesansbold.ttf', 32)
+game_over_font = pg.font.Font('freesansbold.ttf', 46)
+
+
+
+GAME_OVER_SEC = 10
+GAME_OVER_EVENT = pg.USEREVENT + 1
+pg.time.set_timer(GAME_OVER_EVENT, GAME_OVER_SEC * 1000)
+
+SPAWN_COIN_SEC = 1
+SPAWN_COIN_EVENT = pg.USEREVENT + 2
+pg.time.set_timer(SPAWN_COIN_EVENT, SPAWN_COIN_SEC * 1000)
+
+RESTART_GAME_EVENT = pg.USEREVENT + 3
+restart_game_event = pg.event.Event(RESTART_GAME_EVENT)
 
 MINCE_START = 3
+
+MAX_MINCE = 10
+
+game_over = False
+
+pocet_minci = 0
+
 
 class GameObject(Sprite):
     def __init__(self, x, y, obrazek, scale=1):
@@ -100,14 +123,72 @@ while running:
         if event.type == pg.QUIT:
             running = False
 
+        if event.type == GAME_OVER_EVENT:
+            game_over = True
+
+        if event.type == SPAWN_COIN_EVENT\
+                and not game_over\
+                and len(mince_group) <= MAX_MINCE:
+            x = random.randint(0, OKNO_SIRKA - 50)
+            y = random.randint(0, OKNO_SIRKA - 50)
+            mince_group.add(
+                Mince(x, y, "sprites/mince.png", scale=0.1)
+            )
+
+        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and game_over and text_restart_game_rect.collidepoint(event.pos):
+            pg.event.post(restart_game_event)
+
+        if event.type == RESTART_GAME_EVENT:
+            game_over = False
+
+            for _ in range(MINCE_START):
+                x = random.randint(0, OKNO_SIRKA - 50)
+                y = random.randint(0, OKNO_SIRKA - 50)
+                mince_group.add(
+                    Mince(x, y, "sprites/mince.png", scale=0.1)
+                )
+
+            H1.rect.x = OKNO_SIRKA // 2
+            H1.rect.y = OKNO_VYSKA // 2
+            hrac_group.add(H1)
+
+            pocet_minci = 0
+
+
+
+
     hrac_group.update()
 
-    pg.sprite.spritecollide(H1, mince_group, True)
-
+    for mince in mince_group:
+        if pg.sprite.spritecollide(H1, mince_group, True):
+            print("Nastala kolize")
+            pocet_minci += 1
 
     okno.fill(BILA)
     hrac_group.draw(okno)
     mince_group.draw(okno)
+
+
+    text_skore = skore_font.render(f"Skóre: {pocet_minci}", True, CERNA, BILA)
+    okno.blit(text_skore, (10, 10))
+
+
+
+    if game_over:
+        mince_group.empty()
+        hrac_group.empty()
+
+        okno.fill(CERNA)
+        text_game_over = game_over_font.render(f"KONEC HRY! Skóre: {pocet_minci}", True, BILA, CERNA)
+        text_game_over_rect = text_game_over.get_rect()
+        text_game_over_rect.center = (OKNO_SIRKA // 2, OKNO_VYSKA // 2)
+        okno.blit(text_game_over, text_game_over_rect)
+
+        text_restart_game = skore_font.render("Stiskni pro restart hry!", True, BILA, CERNA)
+        text_restart_game_rect = text_restart_game.get_rect()
+        text_restart_game_rect.center = (OKNO_SIRKA // 2, OKNO_VYSKA // 2 + text_game_over_rect.height)
+        okno.blit(text_restart_game, text_restart_game_rect)
+
 
     pg.display.flip()
     clock.tick(FPS)
