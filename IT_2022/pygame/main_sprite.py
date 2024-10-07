@@ -34,6 +34,8 @@ pg.time.set_timer(SPAWN_COIN_EVENT, SPAWN_COIN_SEC * 1000)
 RESTART_GAME_EVENT = pg.USEREVENT + 3
 restart_game_event = pg.event.Event(RESTART_GAME_EVENT)
 
+
+
 MINCE_START = 3
 
 MAX_MINCE = 10
@@ -45,7 +47,6 @@ pocet_minci = 0
 
 class GameObject(Sprite):
     def __init__(self, x, y, obrazek, scale=1):
-        super().__init__()
         self.image = pg.image.load(obrazek)
         self.image = pg.transform.scale(
             self.image,
@@ -102,6 +103,26 @@ class Mince(GameObject):
         super().__init__(x, y, obrazek, scale)
 
 
+def spawn_mince(mince_group, hrac):
+    while True:
+        x = random.randint(0, OKNO_SIRKA - 50)
+        y = random.randint(0, OKNO_VYSKA - 50)
+        nova_mince = Mince(x, y, "sprites/mince.png", scale=0.1)
+
+        if nova_mince.rect.colliderect(hrac.rect):
+            continue
+
+        koliduje = False
+        for mince in mince_group:
+            if nova_mince.rect.colliderect(mince.rect):
+                koliduje = True
+                break
+
+        if not koliduje:
+            mince_group.add(nova_mince)
+            break
+
+
 
 H1 = Hrac(OKNO_SIRKA // 2, OKNO_VYSKA // 2, "sprites/truhla.png", 5)
 hrac_group = Group()
@@ -110,11 +131,7 @@ hrac_group.add(H1)
 mince_group = Group()
 
 for _ in range(MINCE_START):
-    x = random.randint(0, OKNO_SIRKA - 50)
-    y = random.randint(0, OKNO_SIRKA - 50)
-    mince_group.add(
-        Mince(x, y, "sprites/mince.png", scale=0.1)
-    )
+    spawn_mince(mince_group, H1)
 
 
 running = True
@@ -129,24 +146,21 @@ while running:
         if event.type == SPAWN_COIN_EVENT\
                 and not game_over\
                 and len(mince_group) <= MAX_MINCE:
-            x = random.randint(0, OKNO_SIRKA - 50)
-            y = random.randint(0, OKNO_SIRKA - 50)
-            mince_group.add(
-                Mince(x, y, "sprites/mince.png", scale=0.1)
-            )
+            spawn_mince(mince_group, H1)
 
-        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and game_over and text_restart_game_rect.collidepoint(event.pos):
+
+
+        if event.type == pg.MOUSEBUTTONDOWN\
+                and event.button == 1\
+                and game_over\
+                and text_restart_game_rect.collidepoint(event.pos):
             pg.event.post(restart_game_event)
 
         if event.type == RESTART_GAME_EVENT:
             game_over = False
 
             for _ in range(MINCE_START):
-                x = random.randint(0, OKNO_SIRKA - 50)
-                y = random.randint(0, OKNO_SIRKA - 50)
-                mince_group.add(
-                    Mince(x, y, "sprites/mince.png", scale=0.1)
-                )
+                spawn_mince(mince_group, H1)
 
             H1.rect.x = OKNO_SIRKA // 2
             H1.rect.y = OKNO_VYSKA // 2
@@ -154,15 +168,11 @@ while running:
 
             pocet_minci = 0
 
-
-
-
     hrac_group.update()
 
-    for mince in mince_group:
-        if pg.sprite.spritecollide(H1, mince_group, True):
-            print("Nastala kolize")
-            pocet_minci += 1
+    if pg.sprite.spritecollide(H1, mince_group, True):
+        pocet_minci += 1
+
 
     okno.fill(BILA)
     hrac_group.draw(okno)
