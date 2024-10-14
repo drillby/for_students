@@ -25,25 +25,20 @@ game_over_font = pg.font.Font('freesansbold.ttf', 46)
 GAME_OVER_EVENT = pg.USEREVENT + 1
 game_over_event = pg.event.Event(GAME_OVER_EVENT)
 
-"""
-SPAWN_COIN_SEC = 1
-SPAWN_COIN_EVENT = pg.USEREVENT + 2
-pg.time.set_timer(SPAWN_COIN_EVENT, SPAWN_COIN_SEC * 1000)
+
+SPAWN_STRELA_SEC = 1
+SPAWN_STRELA_EVENT = pg.USEREVENT + 2
+pg.time.set_timer(SPAWN_STRELA_EVENT, SPAWN_STRELA_SEC * 1000)
+
 
 RESTART_GAME_EVENT = pg.USEREVENT + 3
 restart_game_event = pg.event.Event(RESTART_GAME_EVENT)
-"""
 
-"""
-MINCE_START = 3
 
-MAX_MINCE = 10
-"""
 pocet_bodu = 0
 
 
 game_over = False
-
 
 
 
@@ -67,9 +62,9 @@ class Hrac(GameObject):
     def pohyb(self):
         stisknute_klavesy = pg.key.get_pressed()
         if stisknute_klavesy[pg.K_UP]:
-            self.rect.y = -self.rychlost
+            self.rect.y -= self.rychlost
         if stisknute_klavesy[pg.K_DOWN]:
-            self.rect.y = self.rychlost
+            self.rect.y += self.rychlost
 
     def zkontroluj_hranice(self):
         if self.rect.y < 0:
@@ -88,27 +83,34 @@ class Strela(GameObject):
         self.rychlost = rychlost
 
     def update(self):
-        self.rect.x = -self.rychlost
+        self.rect.x -= self.rychlost
 
         if self.rect.x < 0:
             self.rect.x = OKNO_SIRKA
             # self.kill()
-            pocet_minci += 1
+            global pocet_bodu
+            pocet_bodu += 1
 
 
-def spawn_strela(mince_group):
+def spawn_strela(strely_group):
+    if len(strely_group) < 1:
+        y = random.randint(0, OKNO_VYSKA - 50)
+        nova_strela = Strela(OKNO_SIRKA, y, "sprites/mince.png", 5, scale=0.1)
+        strely_group.add(nova_strela)
+        return
+
     while True:
         y = random.randint(0, OKNO_VYSKA - 50)
-        nova_mince = Strela(OKNO_SIRKA, y, "sprites/mince.png", scale=0.1)
+        nova_strela = Strela(OKNO_SIRKA, y, "sprites/mince.png",5, scale=0.1)
 
         koliduje = False
-        for mince in mince_group:
-            if nova_mince.rect.colliderect(mince.rect):
+        for mince in strely_group:
+            if nova_strela.rect.colliderect(mince.rect):
                 koliduje = True
                 break
 
         if not koliduje:
-            mince_group.add(nova_mince)
+            strely_group.add(nova_strela)
             break
 
 
@@ -130,11 +132,11 @@ while running:
         if event.type == GAME_OVER_EVENT:
             game_over = True
 
-        if event.type == SPAWN_COIN_EVENT\
-                and not game_over\
-                and len(strely_group) <= MAX_MINCE:
+        if event.type == SPAWN_STRELA_EVENT\
+                and not game_over:
             spawn_strela(strely_group)
-
+            # strela = Strela(OKNO_SIRKA, random.randint(0, OKNO_VYSKA), "sprites/mince.png", 5, 0.1)
+            # strely_group.add(strela)
 
 
         if event.type == pg.MOUSEBUTTONDOWN\
@@ -146,16 +148,14 @@ while running:
         if event.type == RESTART_GAME_EVENT:
             game_over = False
 
-            for _ in range(MINCE_START):
-                spawn_strela(strely_group)
-
-            H1.rect.x = OKNO_SIRKA // 2
+            H1.rect.x = 20
             H1.rect.y = OKNO_VYSKA // 2
             hrac_group.add(H1)
 
             pocet_bodu = 0
 
     hrac_group.update()
+    strely_group.update()
 
     if pg.sprite.spritecollide(H1, strely_group, True):
         pg.event.post(game_over_event)
