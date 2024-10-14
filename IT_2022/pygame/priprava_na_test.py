@@ -34,13 +34,15 @@ pg.time.set_timer(SPAWN_STRELA_EVENT, SPAWN_STRELA_SEC * 1000)
 RESTART_GAME_EVENT = pg.USEREVENT + 3
 restart_game_event = pg.event.Event(RESTART_GAME_EVENT)
 
+ULTIMATE_CHARGE_SEC = 3
+ULTIMATE_CHARGE_EVENT = pg.USEREVENT + 4
+pg.time.set_timer(ULTIMATE_CHARGE_EVENT, ULTIMATE_CHARGE_SEC * 1000)
 
 pocet_bodu = 0
 
 
 game_over = False
-
-
+can_use_u = False
 
 class GameObject(Sprite):
     def __init__(self, x, y, obrazek, scale=1):
@@ -154,6 +156,18 @@ while running:
 
             pocet_bodu = 0
 
+            pg.time.set_timer(ULTIMATE_CHARGE_EVENT, ULTIMATE_CHARGE_SEC * 1000)
+
+        if event.type == pg.KEYDOWN and event.key == pg.K_SPACE and can_use_u:
+            pocet_strel = len(strely_group)
+            pocet_bodu += pocet_strel
+            strely_group.empty()
+            can_use_u = False
+            pg.time.set_timer(ULTIMATE_CHARGE_EVENT, ULTIMATE_CHARGE_SEC * 1000)
+
+        if event.type == ULTIMATE_CHARGE_EVENT:
+            can_use_u = True
+
     hrac_group.update()
     strely_group.update()
 
@@ -169,6 +183,9 @@ while running:
     text_skore = skore_font.render(f"Skóre: {pocet_bodu}", True, CERNA, BILA)
     okno.blit(text_skore, (10, 10))
 
+
+    text_skore = skore_font.render("U" if can_use_u else "N", True, CERNA, BILA)
+    okno.blit(text_skore, (OKNO_SIRKA - 30, 10))
 
 
     if game_over:
