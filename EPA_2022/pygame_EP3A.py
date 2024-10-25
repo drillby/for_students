@@ -1,3 +1,7 @@
+# spawn jablka do hada
+# restart hry
+# zkažená jablka
+
 import random
 
 import pygame
@@ -49,10 +53,11 @@ class Apple(GameObject):
 
 
 class Snake(GameObject):
-    def __init__(self, rozmer, pozice, barva):
+    def __init__(self, rozmer, pozice, barva, barva_hlavy):
         super().__init__(rozmer, pozice, barva)
         self.smer_pohybu = [0, 0]  # [x, y]
         self.segmenty = [self.pozice]
+        self.barva_hlavy = barva_hlavy
 
     def zveceni(self):
         self.segmenty.append(self.segmenty[-1])
@@ -100,8 +105,11 @@ class Snake(GameObject):
         return False
 
     def vykresli(self, okno):
-        for segment in self.segmenty:
-            pygame.draw.rect(okno, self.barva, (*segment, *self.rozmer))
+        for idx, segment in enumerate(self.segmenty):
+            if idx == 0:
+                pygame.draw.rect(okno, self.barva_hlavy, (*segment, *self.rozmer))
+            else:
+                pygame.draw.rect(okno, self.barva, (*segment, *self.rozmer))
 
 
 # Vytvoření okna
@@ -110,7 +118,7 @@ okno = pygame.display.set_mode((OKNO_SIRKA, OKNO_VYSKA))
 # Nastavení titulku okna
 pygame.display.set_caption("Můj první program v Pygame")
 
-H1 = Snake((50, 50), [100, 100], MODRA)
+H1 = Snake((50, 50), [100, 100], MODRA, CERNA)
 A1 = Apple((50, 50), [200, 200], CERVENA)
 
 running = True
