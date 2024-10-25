@@ -1,6 +1,3 @@
-# TODO: zrychlit pohyb hada když skore%10 == 0
-# TODO: vypsat skore na obrazovku
-
 import random
 
 import pygame
@@ -13,6 +10,13 @@ OKNO_SIRKA = 800
 BILA = (255, 255, 255)
 MODRA = (0, 0, 255)
 CERVENA = (255, 0, 0)
+CERNA = (0, 0, 0)
+
+ZRYCHLENI_KAZDYCH_X = 10
+MIN_INTERVAL_SEC = 0.1
+ZMENA_INTERVALU = 0.05
+
+score_font = pygame.font.Font("freesansbold.ttf", 32)
 
 hodiny = pygame.time.Clock()
 FPS = 60
@@ -39,13 +43,17 @@ class Apple(GameObject):
         super().__init__(rozmer, pozice, barva)
 
     def zkontroluj_kolizi(self, hrac):
-        return hrac.pozice == self.pozice
+        return hrac.segmenty[0] == self.pozice
 
 
 class Snake(GameObject):
     def __init__(self, rozmer, pozice, barva):
         super().__init__(rozmer, pozice, barva)
         self.smer_pohybu = [0, 0]  # [x, y]
+        self.segmenty = [self.pozice]
+
+    def zveceni(self):
+        self.segmenty.append(self.segmenty[-1])
 
     def zjisteni_smeru(self, stisknute_klavesy):
         if stisknute_klavesy[pygame.K_LEFT]:
@@ -63,8 +71,14 @@ class Snake(GameObject):
             self.smer_pohybu[0] = 0
 
     def pohyb(self):
-        self.pozice[0] += self.smer_pohybu[0] * self.rozmer[0]
-        self.pozice[1] += self.smer_pohybu[1] * self.rozmer[1]
+        # self.pozice[0] += self.smer_pohybu[0] * self.rozmer[0]
+        # self.pozice[1] += self.smer_pohybu[1] * self.rozmer[1]
+        nova_pozice = [
+            self.segmenty[0][0] + self.smer_pohybu[0] * self.rozmer[0],
+            self.segmenty[0][1] + self.smer_pohybu[1] * self.rozmer[1],
+        ]  # [50, 50] [[50, 50]]
+        # [[0, 0], [50, 0], [100, 0]]
+        self.segmenty = [nova_pozice] + self.segmenty[:-1]
 
     def zkontroluj_hranice(self):
         if self.pozice[0] < 0:
@@ -75,6 +89,10 @@ class Snake(GameObject):
             self.pozice[0] = OKNO_SIRKA - self.rozmer[0]
         if self.pozice[1] > OKNO_VYSKA - self.rozmer[1]:
             self.pozice[1] = OKNO_VYSKA - self.rozmer[1]
+
+    def vykresli(self, okno):
+        for segment in self.segmenty:
+            pygame.draw.rect(okno, self.barva, (*segment, *self.rozmer))
 
 
 # Vytvoření okna
@@ -104,10 +122,21 @@ while running:
         seznam_x = [i for i in range(0, OKNO_SIRKA, A1.rozmer[0])]
         seznam_y = list(range(0, OKNO_VYSKA, A1.rozmer[1]))
         A1.pozice = [random.choice(seznam_x), random.choice(seznam_y)]
+        H1.zveceni()
+
+        if (
+            skore % ZRYCHLENI_KAZDYCH_X == 0
+            and skore != 0
+            and MOVE_SNAKE_SEC > MIN_INTERVAL_SEC
+        ):
+            MOVE_SNAKE_SEC -= ZMENA_INTERVALU
+            pygame.time.set_timer(MOVE_SNAKE_EVENT, int(MOVE_SNAKE_SEC * 1000))
 
     okno.fill(BILA)
     # Obnovení okna
     H1.vykresli(okno)
     A1.vykresli(okno)
+    text = score_font.render(f"Score: {skore}", True, CERNA)
+    okno.blit(text, (10, 10))
     pygame.display.flip()
     hodiny.tick(FPS)
