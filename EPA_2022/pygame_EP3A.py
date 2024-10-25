@@ -27,6 +27,8 @@ pygame.time.set_timer(MOVE_SNAKE_EVENT, int(MOVE_SNAKE_SEC * 1000))
 
 skore = 0
 
+game_over = False
+
 
 class GameObject:
     def __init__(self, rozmer, pozice, barva):
@@ -56,17 +58,17 @@ class Snake(GameObject):
         self.segmenty.append(self.segmenty[-1])
 
     def zjisteni_smeru(self, stisknute_klavesy):
-        if stisknute_klavesy[pygame.K_LEFT]:
+        if stisknute_klavesy[pygame.K_LEFT] and self.smer_pohybu[0] == 0:
             self.smer_pohybu[0] = -1
             self.smer_pohybu[1] = 0
-        elif stisknute_klavesy[pygame.K_RIGHT]:
+        elif stisknute_klavesy[pygame.K_RIGHT] and self.smer_pohybu[0] == 0:
             self.smer_pohybu[0] = 1
             self.smer_pohybu[1] = 0
 
-        if stisknute_klavesy[pygame.K_UP]:
+        if stisknute_klavesy[pygame.K_UP] and self.smer_pohybu[1] == 0:
             self.smer_pohybu[1] = -1
             self.smer_pohybu[0] = 0
-        elif stisknute_klavesy[pygame.K_DOWN]:
+        elif stisknute_klavesy[pygame.K_DOWN] and self.smer_pohybu[1] == 0:
             self.smer_pohybu[1] = 1
             self.smer_pohybu[0] = 0
 
@@ -81,14 +83,21 @@ class Snake(GameObject):
         self.segmenty = [nova_pozice] + self.segmenty[:-1]
 
     def zkontroluj_hranice(self):
-        if self.pozice[0] < 0:
-            self.pozice[0] = 0
-        if self.pozice[1] < 0:
-            self.pozice[1] = 0
-        if self.pozice[0] > OKNO_SIRKA - self.rozmer[0]:
-            self.pozice[0] = OKNO_SIRKA - self.rozmer[0]
-        if self.pozice[1] > OKNO_VYSKA - self.rozmer[1]:
-            self.pozice[1] = OKNO_VYSKA - self.rozmer[1]
+        global game_over
+        if self.segmenty[0][0] < 0:
+            game_over = True
+        if self.segmenty[0][1] < 0:
+            game_over = True
+        if self.segmenty[0][0] > OKNO_SIRKA - self.rozmer[0]:
+            game_over = True
+        if self.segmenty[0][1] > OKNO_VYSKA - self.rozmer[1]:
+            game_over = True
+
+    def zkontroluj_kolizi(self):
+        for segment in self.segmenty[1:]:
+            if self.segmenty[0] == segment:
+                return True
+        return False
 
     def vykresli(self, okno):
         for segment in self.segmenty:
@@ -112,6 +121,8 @@ while running:
         elif event.type == MOVE_SNAKE_EVENT:
             H1.pohyb()
             H1.zkontroluj_hranice()
+            if H1.zkontroluj_kolizi():
+                game_over = True
 
     stisknute_klavesy = pygame.key.get_pressed()
 
@@ -138,5 +149,12 @@ while running:
     A1.vykresli(okno)
     text = score_font.render(f"Score: {skore}", True, CERNA)
     okno.blit(text, (10, 10))
+
+    if game_over:
+        H1.smer_pohybu = [0, 0]
+        okno.fill(CERNA)
+        text = score_font.render(f"Score: {skore}", True, BILA)
+        text_rect = text.get_rect(center=(OKNO_SIRKA // 2, OKNO_VYSKA // 2))
+        okno.blit(text, text_rect)
     pygame.display.flip()
     hodiny.tick(FPS)
