@@ -131,6 +131,25 @@ while running:
             H1.zkontroluj_hranice()
             if H1.zkontroluj_kolizi():
                 game_over = True
+        elif (
+            event.type == pygame.MOUSEBUTTONDOWN
+            and game_over
+            and pygame.mouse.get_pressed()[0]
+            and text_restart_rect.collidepoint(event.pos)
+        ):
+            game_over = False
+            skore = 0
+            seznam_x = [i for i in range(0, OKNO_SIRKA, A1.rozmer[0])]
+            seznam_y = list(range(0, OKNO_VYSKA, A1.rozmer[1]))
+            H1 = Snake(
+                (50, 50),
+                [random.choice(seznam_x), random.choice(seznam_y)],
+                MODRA,
+                CERNA,
+            )
+            A1 = Apple(
+                (50, 50), [random.choice(seznam_x), random.choice(seznam_y)], CERVENA
+            )
 
     stisknute_klavesy = pygame.key.get_pressed()
 
@@ -164,5 +183,10 @@ while running:
         text = score_font.render(f"Score: {skore}", True, BILA)
         text_rect = text.get_rect(center=(OKNO_SIRKA // 2, OKNO_VYSKA // 2))
         okno.blit(text, text_rect)
+        text_restart = score_font.render("Stiskni pro restart", True, BILA)
+        text_restart_rect = text_restart.get_rect(
+            center=(OKNO_SIRKA // 2, OKNO_VYSKA // 2 + text_rect.height)
+        )
+        okno.blit(text_restart, text_restart_rect)
     pygame.display.flip()
     hodiny.tick(FPS)
