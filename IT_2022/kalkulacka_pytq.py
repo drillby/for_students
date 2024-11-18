@@ -20,6 +20,8 @@ class Kalkukacka(QWidget):
         self.radek = QLineEdit()
         self.rozlozeni.addWidget(self.radek)
 
+        self.posledni_znak_eq = False
+
         self.rozlozeni.addLayout(self.grid)
         self.znaky = [
             ["(", ")", "H", "/"],
@@ -40,6 +42,22 @@ class Kalkukacka(QWidget):
         tlacitko = self.sender()
         znak = tlacitko.text()
         priklad = self.radek.text()
+        if self.posledni_znak_eq:
+            if znak in "+-*/":
+                print(1)
+                self.radek.setText(priklad + znak)
+                self.posledni_znak_eq = False
+            elif znak == "=":
+                print(2)
+                self.vypocti_priklad(priklad, self.radek)
+                self.posledni_znak_eq = False
+            else:
+                print(priklad)
+                print(self.radek.text())
+                self.radek.clear()
+                print(self.radek.text())
+                self.radek.setText(znak)
+                self.posledni_znak_eq = False
         if znak == "=":
             self.vypocti_priklad(priklad, self.radek)
         else:
@@ -73,6 +91,7 @@ class Kalkukacka(QWidget):
             out_widget.setText("Chybí ')")
             return
         vysledek = str(eval(priklad))
+        self.posledni_znak_eq = True
         out_widget.setText(vysledek)
 
 
