@@ -3,6 +3,7 @@
 # max 10 mincí na obrazovce
 
 import math
+import random
 
 import pygame as pg
 
@@ -12,12 +13,20 @@ OKNO_SIRKA = 800
 OKNO_VYSKA = 600
 
 BILA = (255, 255, 255)
+CERNA = (0, 0, 0)
 
 okno = pg.display.set_mode((OKNO_SIRKA, OKNO_VYSKA))
 pg.display.set_caption("Truhla")
 
 hodiny = pg.time.Clock()
 FPS = 60
+
+score_font = pg.font.Font("freesansbold.ttf", 32)
+
+
+SPAWN_MINCE_EVENT = pg.USEREVENT + 1
+SPAWN_KAZDYCH_X = 5
+pg.time.set_timer(SPAWN_MINCE_EVENT, SPAWN_KAZDYCH_X * 1000)
 
 
 class GameObject(pg.sprite.Sprite):
@@ -38,6 +47,7 @@ class Hrac(GameObject):
     def __init__(self, x, y, rychlost, obrazek, scale):
         super().__init__(x, y, obrazek, scale)
         self.rychlost = rychlost
+        self.skore = 0
 
     def update(self):
         self.pohyb()
@@ -100,15 +110,23 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+        if event.type == SPAWN_MINCE_EVENT:
+            pos_x = random.randint(0, OKNO_SIRKA - 50)
+            pos_y = random.randint(0, OKNO_VYSKA - 50)
+            mince = Mince(pos_x, pos_y, "sprites/mince.png", 0.1)
+            mince_group.add(mince)
 
     hrac_group.update()
 
     if pg.sprite.spritecollide(H1, mince_group, True):
+        H1.skore += 1
         print("Mince sebrána!")
 
     okno.fill(BILA)
     hrac_group.draw(okno)
     mince_group.draw(okno)
+    skore_text = score_font.render(f"Skóre: {H1.skore}", True, CERNA)
+    okno.blit(skore_text, (10, 10))
     pg.display.flip()
     hodiny.tick(FPS)
 pg.quit()
