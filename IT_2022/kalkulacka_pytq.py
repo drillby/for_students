@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 
 
 class Kalkukacka(QWidget):
-    def __init__(self):
+    def __init__(self, historie_widget):
         super().__init__() # toto je zkrácený zápis stejného řádku v předchozí ukázce ḱódu
         self.rozlozeni = QVBoxLayout()
         self.grid = QGridLayout()
@@ -21,6 +21,8 @@ class Kalkukacka(QWidget):
         self.rozlozeni.addWidget(self.radek)
 
         self.posledni_znak_eq = False
+
+        self.historie = historie_widget()
 
         self.rozlozeni.addLayout(self.grid)
         self.znaky = [
@@ -44,22 +46,21 @@ class Kalkukacka(QWidget):
         priklad = self.radek.text()
         if self.posledni_znak_eq:
             if znak in "+-*/":
-                print(1)
                 self.radek.setText(priklad + znak)
                 self.posledni_znak_eq = False
             elif znak == "=":
-                print(2)
                 self.vypocti_priklad(priklad, self.radek)
                 self.posledni_znak_eq = False
+            elif znak == "H":
+                self.historie.show()
             else:
-                print(priklad)
-                print(self.radek.text())
                 self.radek.clear()
-                print(self.radek.text())
                 self.radek.setText(znak)
                 self.posledni_znak_eq = False
-        if znak == "=":
+        elif znak == "=":
             self.vypocti_priklad(priklad, self.radek)
+        elif znak == "H":
+            self.historie.show()
         else:
             self.radek.setText(priklad+znak)
 
@@ -95,10 +96,16 @@ class Kalkukacka(QWidget):
         out_widget.setText(vysledek)
 
 
+class Historie(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.rozlozeni = QVBoxLayout()
+        self.setLayout(self.rozlozeni)
 
-
+        text = QLabel("Test")
+        self.rozlozeni.addWidget(text)
 
 app = QApplication([])
-okno = Kalkukacka()
+okno = Kalkukacka(Historie)
 okno.show()
 app.exec()
