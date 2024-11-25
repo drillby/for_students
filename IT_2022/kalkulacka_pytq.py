@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QGridLayout,
     QListWidget,
-    QListWidgetItem
+    QListWidgetItem,
+    QMessageBox
 )
 
 import os
@@ -114,8 +115,7 @@ class Historie(QWidget):
     def vypis(self):
         self.listWidget.clear()
         if not os.path.isfile("historie.txt"):
-            listWidgetItem = QListWidgetItem("Soubor 'historie.txt' neexistuje")
-            listWidget.addItem(listWidgetItem)
+            QMessageBox.warning(self, "Chyba", "Soubor 'historie.txt' neexistuje")
             return
         with open("historie.txt", "r") as f:
             historie = f.readlines()
