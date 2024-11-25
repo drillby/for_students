@@ -7,8 +7,12 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QLineEdit,
-    QGridLayout
+    QGridLayout,
+    QListWidget,
+    QListWidgetItem
 )
+
+import os
 
 
 class Kalkukacka(QWidget):
@@ -52,6 +56,7 @@ class Kalkukacka(QWidget):
                 self.vypocti_priklad(priklad, self.radek)
                 self.posledni_znak_eq = False
             elif znak == "H":
+                self.historie.vypis()
                 self.historie.show()
             else:
                 self.radek.clear()
@@ -60,6 +65,7 @@ class Kalkukacka(QWidget):
         elif znak == "=":
             self.vypocti_priklad(priklad, self.radek)
         elif znak == "H":
+            self.historie.vypis()
             self.historie.show()
         else:
             self.radek.setText(priklad+znak)
@@ -93,6 +99,7 @@ class Kalkukacka(QWidget):
             return
         vysledek = str(eval(priklad))
         self.posledni_znak_eq = True
+        self.historie.pridej(priklad + "=" + vysledek + "\n")
         out_widget.setText(vysledek)
 
 
@@ -101,9 +108,24 @@ class Historie(QWidget):
         super().__init__()
         self.rozlozeni = QVBoxLayout()
         self.setLayout(self.rozlozeni)
+        self.listWidget = QListWidget()
+        self.rozlozeni.addWidget(self.listWidget)
 
-        text = QLabel("Test")
-        self.rozlozeni.addWidget(text)
+    def vypis(self):
+        self.listWidget.clear()
+        if not os.path.isfile("historie.txt"):
+            listWidgetItem = QListWidgetItem("Soubor 'historie.txt' neexistuje")
+            listWidget.addItem(listWidgetItem)
+            return
+        with open("historie.txt", "r") as f:
+            historie = f.readlines()
+            for priklad in historie:
+                listWidgetItem = QListWidgetItem(priklad)
+                self.listWidget.addItem(listWidgetItem)
+
+    def pridej(self, priklad):
+        with open("historie.txt", "a") as f:
+            f.write(priklad)
 
 app = QApplication([])
 okno = Kalkukacka(Historie)
