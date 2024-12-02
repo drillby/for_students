@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QListWidget, QPushButton, QLabel, QListWidgetItem, QMessageBox
 import json
+import string
 
 
 class PasswordManager(QWidget):
@@ -8,6 +9,10 @@ class PasswordManager(QWidget):
         self.password_path = "./hesla.json"
         self.passwords = self.load_passwords(self.password_path)
         self.initUI()
+
+        self.MIN_LEN = 10
+        self.HAS_NUM = False
+        self.HAS_SPECIAL_CHARS = True
 
     def load_passwords(self, path):
         try:
@@ -62,6 +67,12 @@ class PasswordManager(QWidget):
     def save_password(self):
         username = self.username_input.text()
         password = self.password_input.text()
+        if not username or not password:
+            QMessageBox.warning(self, "Chyba", "Zadejte uživatelské jméno a heslo.")
+            return
+        if not self.check_password_strength(password, self.MIN_LEN, self.HAS_NUM, self.HAS_SPECIAL_CHARS):
+            QMessageBox.warning(self, "Chyba", f"Heslo nesplňuje zadané požadavky\nMinimální délka: {self.MIN_LEN}\nMá obsahovat čísla: {'Ano' if self.HAS_NUM else 'Ne'}\nMá obsahovat speciální znaky: {'Ano' if self.HAS_SPECIAL_CHARS else 'Ne'}")
+            return
         self.username_input.setText("")
         self.password_input.setText("")
         login_pair = {"username": username, "password": password}
@@ -76,6 +87,22 @@ class PasswordManager(QWidget):
             username = login_pair["username"]
             item = QListWidgetItem(username)
             self.list_widget.addItem(item)
+
+    def check_password_strength(self, password, min_len, has_num, has_special_chars):
+        # Kontrola minimální délky
+        if len(password) < min_len:
+            return False
+
+        # Kontrola, zda heslo obsahuje číslo
+        if has_num and not any(char.isdigit() for char in password):
+            return False
+
+        # Kontrola, zda heslo obsahuje speciální znak
+        special_characters = string.punctuation  # Všechny speciální znaky (!, @, #, atd.)
+        if has_special_chars and not any(char in special_characters for char in password):
+            return False
+
+        return True
 
 
     def show_detail(self, item):
