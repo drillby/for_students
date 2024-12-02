@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QListWidget, QPushButton, QLabel, QListWidgetItem
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QListWidget, QPushButton, QLabel, QListWidgetItem, QMessageBox
 import json
+
 
 class PasswordManager(QWidget):
     def __init__(self):
@@ -9,8 +10,11 @@ class PasswordManager(QWidget):
         self.initUI()
 
     def load_passwords(self, path):
-        with open(path, "r") as f:
-            return json.load(f)
+        try:
+            with open(path, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
 
     def initUI(self):
         self.setWindowTitle("Seznam hesel")
@@ -20,6 +24,7 @@ class PasswordManager(QWidget):
 
         # List hesel
         self.list_widget = QListWidget()
+        self.list_widget.itemClicked.connect(self.show_detail)  # Při kliknutí na položku zobrazíme detail
         self.refresh_password_list(self.passwords)
         main_layout.addWidget(self.list_widget)
 
@@ -37,7 +42,6 @@ class PasswordManager(QWidget):
         password_layout = QHBoxLayout()
         password_label = QLabel("Heslo:")
         self.password_input = QLineEdit()
-        # self.password_input.setEchoMode(QLineEdit.Password)  # Zobrazí heslo jako hvězdičky
         password_layout.addWidget(password_label)
         password_layout.addWidget(self.password_input)
 
@@ -48,7 +52,7 @@ class PasswordManager(QWidget):
         main_layout.addLayout(input_layout)
 
         # Tlačítko
-        self.add_button = QPushButton("button")
+        self.add_button = QPushButton("Přidat heslo")
         self.add_button.clicked.connect(self.save_password)
         main_layout.addWidget(self.add_button)
 
@@ -58,27 +62,74 @@ class PasswordManager(QWidget):
     def save_password(self):
         username = self.username_input.text()
         password = self.password_input.text()
+        if not username or not password:
+            QMessageBox.warning(self, "Chyba", "Zadejte uživatelské jméno a heslo.")
+            return
         self.username_input.setText("")
         self.password_input.setText("")
-        login_pair = {
-            "username": username,
-            "password": password
-        }
+        login_pair = {"username": username, "password": password}
         self.passwords.append(login_pair)
         with open(self.password_path, "w") as f:
             json.dump(self.passwords, f)
         self.refresh_password_list(self.passwords)
 
-
     def refresh_password_list(self, passwords):
         self.list_widget.clear()
         for login_pair in passwords:
-            username = login_pair["username"]  # z json dostanem username
-            password = login_pair["password"]  # z json dostanem password
-            # pro každý username, heslo pair vytvoříme ListItem
-            item = QListWidgetItem(f"Username: {username}")
+            username = login_pair["username"]
+            item = QListWidgetItem(username)
             self.list_widget.addItem(item)
-            # ještě přidáme funkci pro zobrazení detailu
+
+
+    def show_detail(self, item):
+        username = item.text()  # Získáme uživatelské jméno z položky seznamu
+        password = None  # Inicializujeme heslo jako None
+
+        # Prohledáme seznam hesel ručně
+        for entry in self.passwords:
+            if entry["username"] == username:
+                password = entry["password"]
+                break  # Jakmile najdeme, ukončíme smyčku
+
+        # Pokud heslo bylo nalezeno, zobrazíme detail
+        if password is not None:
+            self.detail_window = PasswordDetail(username, password)
+            self.detail_window.show()
+        else:
+            # Možná chyba v datech, heslo nebylo nalezeno
+            QMessageBox.warning(self, "Chyba", f"Heslo pro uživatele {username} nebylo nalezeno.")
+
+
+class PasswordDetail(QWidget):
+    def __init__(self, username, password):
+        super().__init__()
+        self.username = username
+        self.password = password
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Detail hesla")
+
+        # Layout pro detail hesla
+        layout = QVBoxLayout()
+
+        # Uživatelské jméno
+        username_label = QLabel(f"Uživatelské jméno: {self.username}")
+        layout.addWidget(username_label)
+
+        # Heslo
+        password_label = QLabel(f"Heslo: {self.password}")
+        layout.addWidget(password_label)
+
+        # Zavírací tlačítko
+        close_button = QPushButton("Zavřít")
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button)
+
+        # Nastavení layoutu
+        self.setLayout(layout)
+
+
 if __name__ == "__main__":
     app = QApplication([])
     window = PasswordManager()
