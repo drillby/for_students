@@ -4,7 +4,8 @@ import json
 class PasswordManager(QWidget):
     def __init__(self):
         super().__init__()
-        self.passwords = self.load_passwords("./hesla.json")
+        self.password_path = "./hesla.json"
+        self.passwords = self.load_passwords(self.password_path)
         self.initUI()
 
     def load_passwords(self, path):
@@ -19,13 +20,7 @@ class PasswordManager(QWidget):
 
         # List hesel
         self.list_widget = QListWidget()
-        for login_pair in self.passwords:
-            username = login_pair["username"] # z json dostanem username
-            password = login_pair["password"] # z json dostanem password
-            # pro každý username, heslo pair vytvoříme ListItem
-            item = QListWidgetItem(f"Username: {username}")
-            self.list_widget.addItem(item)
-            # ještě přidáme funkci pro zobrazení detailu
+        self.refresh_password_list(self.passwords)
         main_layout.addWidget(self.list_widget)
 
         # Horizontální layout pro vstupní pole
@@ -54,11 +49,36 @@ class PasswordManager(QWidget):
 
         # Tlačítko
         self.add_button = QPushButton("button")
+        self.add_button.clicked.connect(self.save_password)
         main_layout.addWidget(self.add_button)
 
         # Nastavení hlavního layoutu
         self.setLayout(main_layout)
 
+    def save_password(self):
+        username = self.username_input.text()
+        password = self.password_input.text()
+        self.username_input.setText("")
+        self.password_input.setText("")
+        login_pair = {
+            "username": username,
+            "password": password
+        }
+        self.passwords.append(login_pair)
+        with open(self.password_path, "w") as f:
+            json.dump(self.passwords, f)
+        self.refresh_password_list(self.passwords)
+
+
+    def refresh_password_list(self, passwords):
+        self.list_widget.clear()
+        for login_pair in passwords:
+            username = login_pair["username"]  # z json dostanem username
+            password = login_pair["password"]  # z json dostanem password
+            # pro každý username, heslo pair vytvoříme ListItem
+            item = QListWidgetItem(f"Username: {username}")
+            self.list_widget.addItem(item)
+            # ještě přidáme funkci pro zobrazení detailu
 if __name__ == "__main__":
     app = QApplication([])
     window = PasswordManager()
