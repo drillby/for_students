@@ -62,9 +62,6 @@ class PasswordManager(QWidget):
     def save_password(self):
         username = self.username_input.text()
         password = self.password_input.text()
-        if not username or not password:
-            QMessageBox.warning(self, "Chyba", "Zadejte uživatelské jméno a heslo.")
-            return
         self.username_input.setText("")
         self.password_input.setText("")
         login_pair = {"username": username, "password": password}
