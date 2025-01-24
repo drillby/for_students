@@ -3,7 +3,10 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication,
     QGridLayout,
+    QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -12,7 +15,21 @@ from PyQt5.QtWidgets import (
 # Vytvoření aplikace
 app = QApplication(sys.argv)
 
-# Hlavní okno
+
+class Historie(QWidget):
+    def __init__(self, historie):
+        super().__init__()
+
+        self.setWindowTitle("Historie")
+        self.rozlozeni = QVBoxLayout()
+        self.setLayout(self.rozlozeni)
+
+        self.historie_list = QListWidget()
+        self.rozlozeni.addWidget(self.historie_list)
+
+        for priklad in historie:
+            item = QListWidgetItem(priklad)
+            self.historie_list.addItem(item)
 
 
 class Kalkukacka(QWidget):
@@ -78,6 +95,7 @@ class Kalkukacka(QWidget):
         self.setLayout(main_layout)
 
         self.priklad = ""
+        self.historie = []
 
     def on_click(self):
         button = self.sender()
@@ -91,13 +109,45 @@ class Kalkukacka(QWidget):
             try:
                 vysledek = eval(self.priklad)
                 self.display.setText(str(vysledek))
+                self.historie.append(self.priklad + " = " + str(vysledek))
             except Exception:
                 self.display.setText("Chyba")
 
-        whitelist = ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/", "x²", "1/x")
+        whitelist = (
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "0",
+            "+",
+            "-",
+            "*",
+            "/",
+            "x²",
+            "1/x",
+            ".",
+        )
         if text in whitelist:
-            
+            if text == "x²":
+                text = "**2"
+                self.priklad += text
+            if text == "1/x":
+                self.priklad = "1/" + self.priklad
+            else:
+                self.priklad += text
+            self.display.setText(self.priklad)
+        if text == "⌫":
+            self.priklad = self.priklad[:-1]
+            self.display.setText(self.priklad)
 
+        if text == "H":
+            self.historie_widget = Historie(self.historie)
+            self.historie_widget.show()
 
 
 # Vytvoření instance hlavního okna
